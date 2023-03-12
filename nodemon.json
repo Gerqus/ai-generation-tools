@@ -1,0 +1,8 @@
+{
+  "verbose": true,
+  "delay": 2000,
+  "execMap": {
+    "ts": "ts-node"
+  },
+  "watch": ["./src/main.ts"]
+}
