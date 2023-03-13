@@ -43,13 +43,11 @@ Do you get the pattern?`,
   [ProgramConstantsId.ITEMS_FOR_SETTINGS]: [
     {
       role: ChatCompletionRequestMessageRoleEnum.System,
-      content: 'You are tabletop RPG game master that writes down good and fun ideas.',
+      content: 'You are a creative lists creating program. You create lists matching provided examples after carefully considering given parameters of list content data. In the lists points created by you, you are creative within required parameters of list. You validate each point to match requirements in parameters. You don\'t explain, you don\'t elaborate. You only list. Be very creative, innovative and think outside the box.',
     },
     {
       role: ChatCompletionRequestMessageRoleEnum.User,
-      content: `You are tabletop RPG game master that writes down good and fun ideas.
-
-I'll write to you a few classes describing of physical things, items, places, figures and a few settings used in RPG games, films or books. Make sure you understand settings with their climate and distinct features very well. Also make sure you understand classes of objects good. For each class of object give me some ideas of what these objects can be in given setting.
+      content: `I'll write to you a few classes describing of physical things, items, places, figures and a few settings used in RPG games, films or books. Make sure you understand settings with their climate and distinct features very well. Also make sure you understand classes of objects good. For each class of object give me some ideas of what these objects can be in given setting. Don't describe, just list. Make ideas engrossing for 25-40 year old receivers, with strong twist towards given setting.
 
 So if I'd give you this parameters:
 things: "weapon", "shopkeeper", "building"
@@ -59,17 +57,15 @@ I'd like you to create me output similar to this:
 - post-apo:
   - weapon: a crowbar, makeshift gauntlet, glass shard, leaf spring bow, axe made of gear
   - shopkeeper: scavenger, petrol baron, water trader, old world artifacts seller
-  - building: ruined supermarket, water reservoir, scavengers camp, watchtower, trench` +
-// `- cyberpunk:
-//   - weapon: bionic interface sniper rifle, exoskeleton, cyber implant, gun, mind control helmet
-//   - shopkeeper: drugs dealer, implants trader, black market seller, pharmacist, guns dealer
-//   - building: implants workshop, garage, corporation sky scrapper, restricted area, military zone` +
+  - building: ruined supermarket, water reservoir, scavengers camp, watchtower, trench
+- "cyberpunk":
+  - ...
 
-`Please confirm, weather you understand or not and are ready to hear some prompts.`,
+Please confirm, weather you understand or not and are ready to hear some prompts.`,
     },
     {
       role: ChatCompletionRequestMessageRoleEnum.Assistant,
-      content: 'Yes, I understand and am ready to hear the prompts. Please provide them.',
+      content: 'Yes, I understand. Please give me the prompts.',
     },
   ]
 };
