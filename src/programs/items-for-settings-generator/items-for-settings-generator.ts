@@ -16,7 +16,8 @@ const operationsParams: ItemsForSettingsConsoleParams = yargs(hideBin(process.ar
   outputFilePath: { alias: 'o', type: 'string', default: '', require: false, description: 'Path to output file' },
   promptsGenerationCount: { alias: 'c', type: 'number', default: 5, require: false, choices: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], number: true, description: 'Count of items and settings taken into prompt in one batch. Will generate count^2 prompts.' },
   waitTime: { alias: 'w', type: 'number', default: 30, require: false, number: true, description: 'Wait time between prompts to ChatGPT' },
-  processAll: { alias: 'a', type: 'boolean', default: false, require: false, description: 'Should process all entries from files under paths? Will do so in batches untill entries exhausted. Otherwise will perform work for 1 batch.'}
+  processAll: { alias: 'a', type: 'boolean', default: false, require: false, description: 'Should process all entries from files under paths? Will do so in batches untill entries exhausted. Otherwise will perform work for 1 batch.'},
+  mergeTmpOnly: { alias: 'm', type: 'boolean', default: false, require: false, description: 'Just merge TEMP files into output and exit.'},
 }).parseSync() as any;
 
 async function ensureOperationParamsCorrect(): Promise<void> {
@@ -94,7 +95,7 @@ function replaceFileContentWith(fileDescriptor: number, newContent: string): voi
 
 function handleSingleTempFilePrep(pathToTmpFile: string, tmpFileOpenMode: string): number {
   let tmpFileHandle: number;
-  if (fs.existsSync(pathToTmpFile)) {
+  if (checkPathIsAccessible(pathToTmpFile, true)) {
     console.log('Reusing exisitng TEMP file under', pathToTmpFile);
     try {
       tmpFileHandle = fs.openSync(pathToTmpFile, tmpFileOpenMode);
@@ -168,15 +169,20 @@ ensureOperationParamsCorrect()
     console.log('promptsGenerationCount', operationsParams.promptsGenerationCount);
     console.log('waitTime', operationsParams.waitTime);
     console.log('processAll', operationsParams.processAll);
-
-    const itemsLists = chunk(importListFromFile(operationsParams.itemsFilePath).reverse(), operationsParams.promptsGenerationCount);
-    const settingsLists = importListFromFile(operationsParams.settingsFilePath).reverse();
-    const constructedResponse: Record<string, Record<string, string[]>> = {};
+    console.log('mergeTmpOnly', operationsParams.mergeTmpOnly);
 
     const [
       tmpOutputFileHandle1,
       tmpOutputFileHandle2,
     ] = openTmpFiles();
+
+    if (operationsParams.mergeTmpOnly) {
+      return;
+    }
+
+    const itemsLists = chunk(importListFromFile(operationsParams.itemsFilePath).reverse(), operationsParams.promptsGenerationCount);
+    const settingsLists = importListFromFile(operationsParams.settingsFilePath).reverse();
+    const constructedResponse: Record<string, Record<string, string[]>> = {};
 
     const totalIterationsExpected = itemsLists.length * settingsLists.length;
     let iterationsDoneCounter = 0;
@@ -196,7 +202,7 @@ ensureOperationParamsCorrect()
         console.log('Batch payload:');
         console.log('\titemsByComma', preparedItemsChunk);
         console.log('\tsettingsByComma', preparedSettingsChunk);
-        
+
         let generatedResponse: string;
         try {
           generatedResponse = (await openAichatService.sendQuery({ itemsByComma, settingsByComma })).content;

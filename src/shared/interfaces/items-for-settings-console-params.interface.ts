@@ -7,4 +7,5 @@ export interface ItemsForSettingsConsoleParams extends UniversalConsoleParams {
   promptsGenerationCount: number;
   waitTime: number;
   processAll: boolean;
+  mergeTmpOnly: boolean;
 }
