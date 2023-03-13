@@ -198,7 +198,7 @@ ensureOperationParamsCorrect()
 
         const openAichatService = new ChatQueriesSender(ProgramConstantsId.ITEMS_FOR_SETTINGS);
         console.log('--- --- ---');
-        console.log('Sending batch query #' + (++iterationsDoneCounter) + ' / ' + totalIterationsExpected + `(${(iterationsDoneCounter / totalIterationsExpected).toFixed(1)}%)`);
+        console.log('Sending batch query #' + (++iterationsDoneCounter) + ' / ' + totalIterationsExpected + `(${((iterationsDoneCounter / totalIterationsExpected) * 100).toFixed(1)}%)`);
         console.log('Batch payload:');
         console.log('\titemsByComma', preparedItemsChunk);
         console.log('\tsettingsByComma', preparedSettingsChunk);
