@@ -1,0 +1,30 @@
+--- --- ---
+Sending batch query #52 / 1159(4.5%)
+Batch payload:
+        itemsByComma [
+  'merchants camp',
+  'bandit camp',
+  'post apo safe heaven',
+  'bunker',
+  'pyramid'
+]
+        settingsByComma post-apocalyptic
+Query prepared. The query is:
+objects classes: "merchants camp", "bandit camp", "post apo safe heaven", "bunker", "pyramid"
+settings: "post-apocalyptic"
+Sending query to ChatGPT...
+Expecting response of aproximate length: 3713
+~
+Response received:
+        - post-apocalyptic:
+          - merchants camp:
+            - caravan of mutated camels
+            - traveling bazaar on wheels
+            - fortified marketplace
+            - bartering ...
+~
+- post-apocalyptic
+Response parsed. Writing to TMP files...
+TMP files written. Sleeping for 20s...
+Stream closed by ChatGPT. Data from close event: undefined
+--- --- ---
