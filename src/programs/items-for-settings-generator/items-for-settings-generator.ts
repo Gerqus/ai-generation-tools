@@ -9,6 +9,7 @@ import { checkPathIsAccessible } from "../../shared/modules/files-operations/ens
 import { importJSONFromFile, importListFromFile } from "../../shared/modules/files-operations/file-list-loader";
 import { ChatQueriesSender } from "../../shared/modules/open-ai-communications/prompt-to-chat.service";
 import { chunk, isArray, isEmpty, mergeWith, uniq } from 'lodash';
+import { replaceFileContentWith } from "../../shared/modules/files-operations/replace-file-content-with";
 
 const operationsParams: ItemsForSettingsConsoleParams = yargs(hideBin(process.argv)).options({
   itemsFilePath: { alias: 'i', type: 'string', default: '', require: false, description: 'Path to items list file' },
@@ -19,6 +20,8 @@ const operationsParams: ItemsForSettingsConsoleParams = yargs(hideBin(process.ar
   processAll: { alias: 'a', type: 'boolean', default: false, require: false, description: 'Should process all entries from files under paths? Will do so in batches untill entries exhausted. Otherwise will perform work for 1 batch.'},
   mergeTmpOnly: { alias: 'm', type: 'boolean', default: false, require: false, description: 'Just merge TEMP files into output and exit.'},
 }).parseSync() as any;
+
+const encoding = 'utf8';
 
 async function ensureOperationParamsCorrect(): Promise<void> {
   operationsParams.itemsFilePath = await ensureValidParam(
@@ -57,7 +60,7 @@ function mergeNewContentIntoOutputFile(textToMerge: string | Object): void {
     return;
   }
   const outputFileHandle = fs.openSync(operationsParams.outputFilePath, 'r+');
-  const currentOutputContent = importJSONFromFile(outputFileHandle);
+  const currentOutputContent = importJSONFromFile(outputFileHandle, encoding);
   let mergedOutput = null;
   let mergingFailed = false;
 
@@ -83,14 +86,8 @@ function mergeNewContentIntoOutputFile(textToMerge: string | Object): void {
     newFileContent = JSON.stringify(mergedOutput);
   }
 
-  replaceFileContentWith(outputFileHandle, newFileContent);
+  replaceFileContentWith(outputFileHandle, newFileContent, encoding);
   fs.closeSync(outputFileHandle);
-}
-
-function replaceFileContentWith(fileDescriptor: number, newContent: string): void {
-  fs.ftruncateSync(fileDescriptor, 0);
-  const contentBuffer = Buffer.from(newContent);
-  fs.writeSync(fileDescriptor, contentBuffer, 0, contentBuffer.length, 0);
 }
 
 function handleSingleTempFilePrep(pathToTmpFile: string, tmpFileOpenMode: string): number {
@@ -100,7 +97,7 @@ function handleSingleTempFilePrep(pathToTmpFile: string, tmpFileOpenMode: string
     try {
       tmpFileHandle = fs.openSync(pathToTmpFile, tmpFileOpenMode);
       try {
-        const tmp1FileContent = importJSONFromFile(pathToTmpFile);
+        const tmp1FileContent = importJSONFromFile(pathToTmpFile, encoding);
         if (!isEmpty(tmp1FileContent)) {
           mergeNewContentIntoOutputFile(tmp1FileContent);
           console.log('Residue in ' + pathToTmpFile + ' detected. Successfully merged it into output.');
@@ -135,18 +132,18 @@ function openTmpFiles(): number[] {
 
   console.log(`TEMP files ${tmp1FilePath} and ${tmp2FilePath} 'empty or merge' check: OK`);
 
-  fs.writeFileSync(tmpOutputFileHandle1, 'test');
-  fs.writeFileSync(tmpOutputFileHandle2, 'test');
+  replaceFileContentWith(tmpOutputFileHandle1, 'test', encoding);
+  replaceFileContentWith(tmpOutputFileHandle2, 'test', encoding);
 
   console.log(`TEMP files write: OK`);
 
-  replaceFileContentWith(tmpOutputFileHandle1, '');
+  replaceFileContentWith(tmpOutputFileHandle1, '', encoding);
   if (fs.readFileSync(tmpOutputFileHandle1).length > 0) {
     console.error('truncation failed');
     process.exit();
   }
   
-  replaceFileContentWith(tmpOutputFileHandle2, '');
+  replaceFileContentWith(tmpOutputFileHandle2, '', encoding);
   if (fs.readFileSync(tmpOutputFileHandle2).length > 0) {
     console.error('truncation failed');
     process.exit();
@@ -276,14 +273,14 @@ ensureOperationParamsCorrect()
         const tmpPayload = JSON.stringify(constructedResponse).trim();
 
         try {
-          replaceFileContentWith(tmpOutputFileHandle1, tmpPayload);
+          replaceFileContentWith(tmpOutputFileHandle1, tmpPayload, encoding);
         } catch {
           console.error('Error writing TEMP 1 file. Terminating to prevent data corruption');
           process.exit();
         }
         
         try {
-          replaceFileContentWith(tmpOutputFileHandle2, tmpPayload);
+          replaceFileContentWith(tmpOutputFileHandle2, tmpPayload, encoding);
         } catch {
           console.error('Error writing TEMP 2 file. Terminating to prevent data corruption');
           process.exit();
