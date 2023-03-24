@@ -1,7 +1,5 @@
 from transformers import T5ForConditionalGeneration, AutoTokenizer
 
-from prompts_loop import run_prompts_loop
-
 device_map = {
   "": "cpu"
 }

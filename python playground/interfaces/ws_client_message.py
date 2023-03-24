@@ -21,3 +21,9 @@ class ClientMessage:
             raise ValueError("Message is not a valid JSON object")
 
         return ClientMessage(parsed_message.command_name, parsed_message.command_args)
+    
+    def to_json(self):
+        return json.dumps({
+            "command_name": self.command_name.value,
+            "command_args": self.command_args
+        })
