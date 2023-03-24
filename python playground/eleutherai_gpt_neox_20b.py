@@ -1,8 +1,11 @@
-from transformers import GPTNeoXForCausalLM, AutoTokenizer
+from transformers import GPTNeoXForCausalLM, AutoTokenizer, PreTrainedModel
 
 chatbot = GPTNeoXForCausalLM.from_pretrained(
   "EleutherAI/gpt-neox-20b",
 )
+# check if model is instance of class PreTrainedModel
+if (not isinstance(chatbot, PreTrainedModel)):
+    raise TypeError("Model from pretrained is not a valid model")
 
 tokenizer = AutoTokenizer.from_pretrained(
   "EleutherAI/gpt-neox-20b",

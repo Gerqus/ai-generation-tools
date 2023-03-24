@@ -1,9 +1,14 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedModel
 import torch
 
 
 tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-large")
 model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-large")
+# check if model is instance of class PreTrainedModel
+if (not isinstance(model, PreTrainedModel)):
+    raise TypeError("Model from pretrained is not a valid model")
+
+chat_history_ids = torch.LongTensor()
 
 # Let's chat for 5 lines
 for step in range(5):
@@ -11,7 +16,7 @@ for step in range(5):
     new_user_input_ids = tokenizer.encode(input(">> User: ") + tokenizer.eos_token, return_tensors='pt')
 
     # append the new user input tokens to the chat history
-    bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
+    bot_input_ids = torch.cat([torch.Tensor(chat_history_ids), torch.Tensor(new_user_input_ids)], dim=-1) if step > 0 else torch.Tensor(new_user_input_ids)
 
     # generated a response while limiting the total chat history to 1000 tokens, 
     chat_history_ids = model.generate(bot_input_ids, max_length=10000000, pad_token_id=tokenizer.eos_token_id)

@@ -1,12 +1,18 @@
-import socket
+import asyncio
+import websockets
+import websockets.client
 
 HOST = 'localhost'
-PORT = 12345
+PORT = 5000
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(b'Hello, World!')
-    s.shutdown(socket.SHUT_WR)
-    data = s.recv(1024)
+async def main():
+    async with websockets.client.connect(f'ws://{HOST}:{PORT}') as websocket:
+        await websocket.send('Hello from client!')
+        print(f'> {await websocket.recv()}')
 
-print('Received', repr(data.decode()))
+asyncio.get_event_loop().run_until_complete(main())
+
+# Output:
+# > Hello from server! Who are you?
+# < {"command_name": "identity", "command_args": {"identity": "model_runner_client"}}
+# > {"command_name": "run_model", "command_args": {"model_name": "test_model"}, "result": "test_model_result"}
