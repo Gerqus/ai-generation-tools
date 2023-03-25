@@ -2,7 +2,7 @@ from multiprocessing.connection import Connection
 import readline
 import time
 from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast, PreTrainedModel
-from actions_logger import Logger
+from shared.actions_logger import Logger
 
 log = Logger(source_service="prompts_loop.py", print_to_console=True).log
 

@@ -5,9 +5,9 @@ import torch
 from transformers import T5ForConditionalGeneration, AutoTokenizer, PreTrainedTokenizer, PreTrainedTokenizerFast, PreTrainedModel
 import colorama
 from colorama import Fore, Style
-from actions_logger import Logger
+from shared.actions_logger import Logger
 from prompts_loop import run_prompts_loop
-import bytes_to_human_readable
+import shared.bytes_to_human_readable as bytes_to_human_readable
 
 class SupportedAIModelDefinition(TypedDict("SupportedAIModelDefinition", name=str, tokenizer=str, model=str)):
   name: str
