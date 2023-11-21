@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import json
 from interfaces.enum_base import BaseEnum
 
@@ -6,10 +7,10 @@ class SupportedCommands(BaseEnum):
     info = "info"
     run_model = "run_model"
 
+@dataclass
 class QuestionMessage:
-    def __init__(self, command_name: SupportedCommands, command_args: dict | None):
-        self.command_name = command_name
-        self.command_args = command_args
+    command_name: SupportedCommands
+    command_args: dict | None
     
     @classmethod
     def from_json(cls, message: str):
